@@ -224,8 +224,8 @@ open class URLSessionTransport: NSObject, PhoenixTransport, URLSessionWebSocketD
         }
     
         self.readyState = .closing
-        self.task?.cancel(with: closeCode, reason: reason?.data(using: .utf8))
         self.session?.invalidateAndCancel()
+        self.task?.cancel(with: closeCode, reason: reason?.data(using: .utf8))
     }
   
     open func send(data: Data) {
