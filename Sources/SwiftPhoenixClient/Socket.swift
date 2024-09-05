@@ -259,6 +259,7 @@ public class Socket: PhoenixTransportDelegate {
                                                    paramsClosure: self.paramsClosure,
                                                    vsn: self.vsn)
 
+        self.connection?.disconnect(code: CloseCode.normal.rawValue, reason: "Opening new connection")
         self.connection = self.transport(self.endPointUrl)
         self.connection?.delegate = self
 //    self.connection?.disableSSLCertValidation = disableSSLCertValidation
@@ -713,7 +714,7 @@ public class Socket: PhoenixTransportDelegate {
         }
     
         // Dispatch the message to all channels that belong to the topic
-        for channel in self._channels {
+        self._channels.forEach {
             if channel.isMember(message) {
                 channel.trigger(message)
             }
@@ -725,7 +726,7 @@ public class Socket: PhoenixTransportDelegate {
   
     /// Triggers an error event to all of the connected Channels
     func triggerChannelError() {
-        for channel in self._channels {
+        self._channels.forEach {
             // Only trigger a channel error if it is in an "opened" state
             if !(channel.isErrored || channel.isLeaving || channel.isClosed) {
                 channel.trigger(event: ChannelEvent.error)
