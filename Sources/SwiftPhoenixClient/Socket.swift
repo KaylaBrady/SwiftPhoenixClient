@@ -714,7 +714,7 @@ public class Socket: PhoenixTransportDelegate {
         }
     
         // Dispatch the message to all channels that belong to the topic
-        self._channels.forEach {
+        self._channels.forEach { channel in
             if channel.isMember(message) {
                 channel.trigger(message)
             }
@@ -726,7 +726,7 @@ public class Socket: PhoenixTransportDelegate {
   
     /// Triggers an error event to all of the connected Channels
     func triggerChannelError() {
-        self._channels.forEach {
+        self._channels.forEach { channel in
             // Only trigger a channel error if it is in an "opened" state
             if !(channel.isErrored || channel.isLeaving || channel.isClosed) {
                 channel.trigger(event: ChannelEvent.error)
