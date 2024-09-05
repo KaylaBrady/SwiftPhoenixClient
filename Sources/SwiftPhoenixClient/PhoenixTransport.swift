@@ -224,8 +224,8 @@ open class URLSessionTransport: NSObject, PhoenixTransport, URLSessionWebSocketD
         }
     
         self.readyState = .closing
-        self.session?.invalidateAndCancel()
         self.task?.cancel(with: closeCode, reason: reason?.data(using: .utf8))
+        self.session?.invalidateAndCancel()
     }
   
     open func send(data: Data) {
@@ -262,6 +262,13 @@ open class URLSessionTransport: NSObject, PhoenixTransport, URLSessionWebSocketD
         // The task has terminated. Inform the delegate that the transport has closed abnormally
         // if this was caused by an error.
         guard let err = error else { return }
+        
+        if let nsError = err as NSError? {
+            // No need to inform the delegate if the task has been intentionally cancelled
+            if nsError.domain == "NSURLErrorDomain" && nsError.code == NSURLErrorCancelled {
+                return
+            }
+        }
     
         self.abnormalErrorReceived(err, response: task.response)
     }
